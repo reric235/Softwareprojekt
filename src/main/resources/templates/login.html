@@ -1,0 +1,82 @@
+<!-- src/main/resources/templates/login.html -->
+
+<!DOCTYPE html>
+<html lang="de"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        /* Grundlegendes Styling für das Login-Formular */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        input, button {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .links {
+            text-align: center;
+        }
+        .links a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+            color: red;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>Login</h1>
+    <form th:action="@{/login}" method="post">
+        <input type="email" name="username" placeholder="E-Mail" required>
+        <input type="password" name="password" placeholder="Passwort" required>
+        <button type="submit">Anmelden</button>
+    </form>
+    <div class="links">
+        <a th:href="@{/registrierung}">Noch kein Konto? Registrieren</a>
+    </div>
+    <p th:if="${param.error}" class="error-message">Login fehlgeschlagen! Bitte überprüfen Sie Ihre Eingaben.</p>
+    <p th:if="${param.logout}" class="success-message">Sie wurden erfolgreich abgemeldet.</p>
+</div>
+</body>
+</html>

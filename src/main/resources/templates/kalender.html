@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompakter Kalender</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls button {
+            padding: 8px 12px;
+            margin: 0 5px;
+            font-size: 14px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        .month-year, .week-range {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            grid-gap: 1px;
+            background-color: #ccc;
+            font-size: 0.85rem;
+        }
+        #calendar div {
+            background: #fff;
+            padding: 5px;
+            text-align: left;
+            border: 1px solid #ccc;
+            min-height: 60px;
+            position: relative;
+        }
+        #calendar .header {
+            background: #007BFF;
+            color: white;
+            font-weight: bold;
+            padding: 5px 0;
+            text-align: center;
+        }
+        #calendar .day-number {
+            position: absolute;
+            top: 10px;
+            left: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        .event {
+            padding: 5px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 0.8rem;
+        }
+        .admin {
+            background-color: #17a2b8;
+        }
+        .admin:hover {
+            background-color: #138496;
+        }
+
+        /* Back-Link Pfeil */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            background-color: #007BFF;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a th:href="@{/index}" class="back-link" title="Zurück zur Übersicht">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 6 L8 12 L14 18" />
+        </svg>
+    </a>
+    <h1>Kompakter Kalender</h1>
+
+    <div class="month-year" id="monthYearDisplay"></div>
+    <div class="week-range" id="weekRangeDisplay" style="display: none;"></div>
+
+    <div class="controls">
+        <button id="prev">Zurück</button>
+        <button id="next">Vorwärts</button>
+        <button id="toggleView">Zur Wochenansicht wechseln</button>
+    </div>
+
+    <div id="calendar"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+        const monthYearEl = document.getElementById('monthYearDisplay');
+        const weekRangeEl = document.getElementById('weekRangeDisplay');
+        const toggleViewBtn = document.getElementById('toggleView');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        let currentDate = new Date();
+        let currentView = 'month';
+
+        const dayNames = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+
+        const updateMonthYearDisplay = () => {
+            const monthNames = [
+                'Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+                'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'
+            ];
+            const month = monthNames[currentDate.getMonth()];
+            const year = currentDate.getFullYear();
+            monthYearEl.textContent = `${month} ${year}`;
+        };
+
+        const updateWeekRangeDisplay = () => {
+            const startOfWeek = new Date(currentDate);
+            startOfWeek.setDate(currentDate.getDate() - ((currentDate.getDay() + 6) % 7)); // Montag
+            const endOfWeek = new Date(startOfWeek);
+            endOfWeek.setDate(startOfWeek.getDate() + 6); // Sonntag
+
+            const options = { day: 'numeric', month: 'short' };
+            const startStr = startOfWeek.toLocaleDateString('de-DE', options);
+            const endStr = endOfWeek.toLocaleDateString('de-DE', options);
+
+            weekRangeEl.textContent = `Woche: ${startStr} - ${endStr}`;
+        };
+
+        const fetchEvents = async () => {
+            try {
+                const response = await fetch('/kalender/kalendereintraege');
+                if (!response.ok) {
+                    throw new Error('Fehler beim Abrufen der Kalendereinträge');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Fehler:', error.message);
+                alert('Kalendereinträge konnten nicht geladen werden.');
+                return [];
+            }
+        };
+
+        const renderCalendar = async () => {
+            calendarEl.innerHTML = '';
+
+            if (currentView === 'month') {
+                monthYearEl.style.display = 'block';
+                weekRangeEl.style.display = 'none';
+                updateMonthYearDisplay();
+            } else {
+                monthYearEl.style.display = 'none';
+                weekRangeEl.style.display = 'block';
+                updateWeekRangeDisplay();
+            }
+
+            const headers = dayNames;
+            headers.forEach(day => {
+                const header = document.createElement('div');
+                header.textContent = day;
+                header.className = 'header';
+                calendarEl.appendChild(header);
+            });
+
+            let daysToRender = [];
+            if (currentView === 'month') {
+                daysToRender = generateMonthDays(currentDate);
+            } else {
+                daysToRender = generateWeekDays(currentDate);
+            }
+
+            // Render day cells
+            daysToRender.forEach(day => {
+                const dayCell = document.createElement('div');
+                dayCell.className = 'day';
+                if (day.isCurrentMonth) {
+                    dayCell.innerHTML = `<span class="day-number">${day.date.getDate()}</span>`;
+                    dayCell.dataset.date = day.date.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }).split('.').reverse().join('-');
+                    // 'YYYY-MM-DD'
+                } else {
+                    dayCell.classList.add('inactive');
+                }
+                calendarEl.appendChild(dayCell);
+            });
+
+            // Fetch and render events
+            const events = await fetchEvents();
+            events.forEach(event => {
+                const eventDate = event.eintragsdatum; // Annahme: 'eintragsdatum' ist 'YYYY-MM-DD'
+                const dayCell = document.querySelector(`[data-date="${eventDate}"]`);
+                if (dayCell) {
+                    const eventDiv = document.createElement('div');
+                    eventDiv.className = 'event';
+                    eventDiv.textContent = `${event.eventType}: ${event.beschreibung} (${event.startTime} - ${event.endTime})`;
+                    dayCell.appendChild(eventDiv);
+                }
+            });
+        };
+
+        const generateMonthDays = (date) => {
+            const year = date.getFullYear();
+            const month = date.getMonth();
+
+            const firstDayOfMonth = new Date(year, month, 1);
+            const lastDayOfMonth = new Date(year, month + 1, 0);
+
+            const days = [];
+
+            const startDay = new Date(firstDayOfMonth);
+            startDay.setDate(firstDayOfMonth.getDate() - ((firstDayOfMonth.getDay() + 6) % 7));
+
+            const endDay = new Date(lastDayOfMonth);
+            endDay.setDate(lastDayOfMonth.getDate() + (6 - ((lastDayOfMonth.getDay() + 6) % 7)));
+
+            let current = new Date(startDay);
+
+            while (current <= endDay) {
+                days.push({
+                    date: new Date(current),
+                    isCurrentMonth: current.getMonth() === month
+                });
+                current.setDate(current.getDate() + 1);
+            }
+
+            return days;
+        };
+
+        const generateWeekDays = (date) => {
+            const current = new Date(date);
+            current.setDate(current.getDate() - ((current.getDay() + 6) % 7)); // Montag
+
+            const days = [];
+            for (let i = 0; i < 7; i++) {
+                days.push({
+                    date: new Date(current),
+                    isCurrentMonth: true
+                });
+                current.setDate(current.getDate() + 1);
+            }
+
+            return days;
+        };
+
+        toggleViewBtn.addEventListener('click', () => {
+            currentView = currentView === 'month' ? 'week' : 'month';
+            toggleViewBtn.textContent = currentView === 'month' ? 'Zur Wochenansicht wechseln' : 'Zur Monatsansicht wechseln';
+            renderCalendar();
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() - 1);
+            } else {
+                currentDate.setDate(currentDate.getDate() - 7);
+            }
+            renderCalendar();
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentView === 'month') {
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            } else {
+                currentDate.setDate(currentDate.getDate() + 7);
+            }
+            renderCalendar();
+        });
+
+        renderCalendar();
+    });
+</script>
+</body>
+</html>

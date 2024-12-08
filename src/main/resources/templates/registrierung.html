@@ -1,0 +1,199 @@
+<!-- src/main/resources/templates/registrierung.html -->
+
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studentenregistrierung</title>
+    <style>
+        /* Grundlegendes Styling für die Registrierung */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            padding-top: 60px; /* Platz für den Button oben */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin: 10px 0 5px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .top-left-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 8px 12px;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .top-left-button:hover {
+            background-color: #0056b3;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .message.success {
+            color: green;
+        }
+        .message.error {
+            color: red;
+        }
+    </style>
+    <!-- CSRF-Token als Meta-Tags -->
+    <meta name="_csrf" content="" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="" th:content="${_csrf.headerName}"/>
+</head>
+<body>
+<div class="container">
+    <!-- Button zur Login-Seite -->
+    <a href="/login" class="top-left-button">Zurück zum Login</a>
+
+    <h1>Registrierung eines Studenten</h1>
+    <form id="registrationForm">
+        <!-- CSRF-Token wird über AJAX gesendet -->
+        <label for="vorname">Vorname:</label>
+        <input type="text" id="vorname" name="vorname" required>
+
+        <label for="nachname">Nachname:</label>
+        <input type="text" id="nachname" name="nachname" required>
+
+        <label for="email">E-Mail:</label>
+        <input type="email" id="email" name="email" required>
+
+        <label for="passwort">Passwort:</label>
+        <input type="password" id="passwort" name="passwort" required minlength="8" placeholder="Mindestens 8 Zeichen">
+
+        <label for="seminargruppe">Seminargruppe:</label>
+        <select id="seminargruppe" name="seminargruppe" required>
+            <option value="" disabled selected>Seminargruppe wählen...</option>
+        </select>
+
+        <button type="submit">Registrieren</button>
+    </form>
+    <div class="message" id="message"></div>
+</div>
+
+<script>
+    // Seminargruppen laden und in das Dropdown-Menü einfügen
+    async function loadSeminargruppen() {
+        const seminargruppeSelect = document.getElementById('seminargruppe');
+        try {
+            const response = await fetch('/api/seminargruppen', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`Fehler beim Abrufen der Seminargruppen: ${response.statusText}`);
+            }
+
+            const seminargruppen = await response.json();
+
+            if (seminargruppen.length === 0) {
+                alert("Keine Seminargruppen verfügbar. Bitte kontaktiere den Administrator.");
+            }
+
+            seminargruppen.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group.seminargruppeId; // Verwende die ID als Wert
+                option.textContent = group.name;
+                seminargruppeSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Netzwerk- oder Serverfehler beim Laden der Seminargruppen:', error);
+            alert("Fehler beim Abrufen der Seminargruppen. Bitte später erneut versuchen.");
+        }
+    }
+
+    // Registrierung absenden via AJAX
+    document.getElementById('registrationForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Daten aus dem Formular sammeln
+        const formData = {
+            vorname: document.getElementById('vorname').value,
+            nachname: document.getElementById('nachname').value,
+            email: document.getElementById('email').value,
+            passwort: document.getElementById('passwort').value,
+            seminargruppeId: parseInt(document.getElementById('seminargruppe').value) // Verwende die ID
+        };
+
+        // CSRF-Token aus den Meta-Tags abrufen
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        // Nachrichtenelement
+        const messageEl = document.getElementById('message');
+        messageEl.textContent = '';
+        messageEl.className = 'message';
+
+        try {
+            // API-Aufruf an den Server
+            const response = await fetch('/api/students/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken // CSRF-Token im Header senden
+                },
+                body: JSON.stringify(formData)
+            });
+
+            const responseText = await response.text();
+
+            if (response.ok) {
+                messageEl.textContent = responseText || 'Student erfolgreich registriert.';
+                messageEl.classList.add('success');
+                document.getElementById('registrationForm').reset();
+            } else {
+                messageEl.textContent = `Fehler: ${responseText || 'Registrierung fehlgeschlagen.'}`;
+                messageEl.classList.add('error');
+            }
+        } catch (error) {
+            messageEl.textContent = `Netzwerkfehler: ${error.message}`;
+            messageEl.classList.add('error');
+        }
+    });
+
+    // Beim Laden der Seite Seminargruppen laden
+    document.addEventListener('DOMContentLoaded', loadSeminargruppen);
+</script>
+</body>
+</html>

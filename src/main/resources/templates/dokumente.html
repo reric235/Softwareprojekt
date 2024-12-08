@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="_csrf" content="" th:content="${_csrf.token}">
+    <meta name="_csrf_header" content="" th:content="${_csrf.headerName}">
+    <title>Dokumentenmanagement</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        select, button, input[type="file"] {
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+            margin-right: 10px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            flex: 0;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .sort-row {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        .sort-row label {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        .sort-row select {
+            width: 200px;
+            margin-right: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+
+        /* Back-Link Pfeil */
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            background-color: #007BFF; /* Hintergrundfarbe des Buttons */
+            color: #fff; /* Farbe des Pfeils */
+            padding: 8px 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-bottom: 20px;
+        }
+
+        .back-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a th:href="@{/index}" class="back-link" title="Zurück zur Übersicht">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+             stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 6 L8 12 L14 18" />
+        </svg>
+    </a>
+
+    <h1>Dokumentenmanagement</h1>
+
+    <div class="form-row">
+        <select id="semesterSelect">
+            <option value="" disabled selected>Wähle ein Semester...</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+        </select>
+        <select id="modulSelect" disabled>
+            <option value="" disabled selected>Wähle ein Modul...</option>
+        </select>
+    </div>
+    <form id="uploadForm">
+        <input type="file" id="file" name="file" required>
+        <button type="submit">Dokument hochladen</button>
+    </form>
+    <div class="sort-row">
+        <label for="sortSelect">Sortieren nach:</label>
+        <select id="sortSelect">
+            <option value="">Keine Sortierung</option>
+            <option value="name,asc">Name (A-Z)</option>
+            <option value="name,desc">Name (Z-A)</option>
+            <option value="uploadDatum,asc">Upload-Datum (aufsteigend)</option>
+            <option value="uploadDatum,desc">Upload-Datum (absteigend)</option>
+        </select>
+    </div>
+    <table>
+        <thead>
+        <tr>
+            <th>Dateiname</th>
+            <th>Upload-Datum</th>
+            <th id="eigentuemer">Eigentümer</th>
+            <th>Dateigröße</th>
+            <th>Download</th>
+            <th>Löschen</th>
+        </tr>
+        </thead>
+        <tbody id="documentTable">
+        <!-- Dokumente werden hier geladen -->
+        </tbody>
+    </table>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', async function () {
+        const semesterSelect = document.getElementById('semesterSelect');
+        const modulSelect = document.getElementById('modulSelect');
+        const documentTable = document.getElementById('documentTable');
+        const uploadForm = document.getElementById('uploadForm');
+        const sortSelect = document.getElementById('sortSelect');
+        const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+        let selectedModulId = null;
+        let selectedSortParam = "";
+        let userEmail = null;
+        let userRole = null;
+
+        async function loadCurrentUser() {
+            try {
+                const response = await fetch('/api/students/current');
+                if (!response.ok) throw new Error('Fehler beim Laden des aktuellen Benutzers.');
+                const userData = await response.json();
+                userEmail = userData.email;
+                userRole = userData.rolle;
+            } catch (error) {
+                console.error(error);
+                alert('Konnte aktuellen Benutzer nicht laden. Evtl. nicht eingeloggt?');
+            }
+        }
+
+        async function loadModules(semester) {
+            try {
+                const response = await fetch(`/api/modul/semester/${semester}`);
+                if (!response.ok) throw new Error('Fehler beim Laden der Module.');
+                const modules = await response.json();
+
+                modulSelect.innerHTML = '<option value="" disabled selected>Wähle ein Modul...</option>';
+                modules.forEach(modul => {
+                    const option = document.createElement('option');
+                    option.value = modul.modulId;
+                    option.textContent = modul.modulname;
+                    modulSelect.appendChild(option);
+                });
+                modulSelect.disabled = false;
+            } catch (error) {
+                console.error(error);
+                alert('Module konnten nicht geladen werden.');
+            }
+        }
+
+        async function loadDocuments(modulId) {
+            try {
+                let url = `/api/dokumente/modul/${modulId}`;
+                if (selectedSortParam) {
+                    url += `?sort=${encodeURIComponent(selectedSortParam)}`;
+                }
+
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Fehler beim Laden der Dokumente.');
+
+                const documents = await response.json();
+                documentTable.innerHTML = ''; // Alte Daten entfernen
+
+                for (const doc of documents) {
+                    // Eigentümer-Daten laden
+                    const ownerResponse = await fetch(`/api/students/by-dokument/${doc.dokumentId}`);
+                    if (!ownerResponse.ok) throw new Error('Fehler beim Laden des Eigentümers.');
+                    const owner = await ownerResponse.json();
+
+                    // Entscheiden, ob der Löschen-Button gezeigt werden soll:
+                    let loeschenButtonHtml = '';
+                    // Check: ADMIN darf alle löschen
+                    // STUDENT oder STUDENTENRAT darf nur löschen, wenn owner.email == userEmail
+                    if (userRole === 'ADMIN' || ((userRole === 'STUDENT' || userRole === 'STUDENTENRAT') && owner.email === userEmail)) {
+                        loeschenButtonHtml = `<button class="delete-btn" onclick="deleteDokument(${doc.dokumentId})">Löschen</button>`;
+                    }
+
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${doc.name}</td>
+                        <td>${new Date(doc.uploadDatum).toLocaleDateString('de-DE')}</td>
+                        <td>${owner.vorname} ${owner.nachname}</td>
+                        <td>${(doc.size / 1024).toFixed(2)} KB</td>
+                        <td><a href="/api/dokumente/download/${doc.dokumentId}" download>Download</a></td>
+                        <td>${loeschenButtonHtml}</td>
+                    `;
+                    documentTable.appendChild(row);
+                }
+            } catch (error) {
+                alert('Fehler beim Laden der Dokumente.');
+                console.error(error);
+            }
+        }
+
+        // Neue Funktion zum Löschen eines Dokuments
+        window.deleteDokument = async function(dokumentId) {
+            if (!confirm('Sind Sie sicher, dass Sie dieses Dokument löschen möchten?')) return;
+
+            try {
+                const response = await fetch(`/api/dokumente/${dokumentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    }
+                });
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(errorText || 'Fehler beim Löschen des Dokuments.');
+                }
+                alert('Dokument erfolgreich gelöscht.');
+                if (selectedModulId) {
+                    loadDocuments(selectedModulId);
+                }
+            } catch (error) {
+                alert(error.message);
+                console.error(error);
+            }
+        };
+
+        semesterSelect.addEventListener('change', function () {
+            const semester = this.value;
+            if (semester) {
+                loadModules(semester);
+            }
+        });
+
+        modulSelect.addEventListener('change', function () {
+            selectedModulId = this.value;
+            if (selectedModulId) {
+                loadDocuments(selectedModulId);
+            }
+        });
+
+        uploadForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            if (!selectedModulId) {
+                alert('Bitte wählen Sie zuerst ein Modul aus.');
+                return;
+            }
+            const formData = new FormData(uploadForm);
+            formData.append('modulId', selectedModulId);
+            try {
+                const response = await fetch('/api/dokumente/upload', {
+                    method: 'POST',
+                    headers: {
+                        [csrfHeader]: csrfToken
+                    },
+                    body: formData
+                });
+                if (!response.ok) throw new Error('Fehler beim Hochladen der Datei.');
+                alert('Dokument erfolgreich hochgeladen.');
+                uploadForm.reset();
+                loadDocuments(selectedModulId);
+            } catch (error) {
+                alert(error.message);
+                console.error(error);
+            }
+        });
+
+        sortSelect.addEventListener('change', function () {
+            selectedSortParam = sortSelect.value;
+            if (selectedModulId) {
+                loadDocuments(selectedModulId);
+            }
+        });
+
+        // Zuerst den aktuellen User laden, dann ist userRole/userEmail bekannt
+        await loadCurrentUser();
+    });
+</script>
+<script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+</script>
+</body>
+</html>
