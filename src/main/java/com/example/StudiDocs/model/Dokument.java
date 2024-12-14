@@ -48,7 +48,6 @@ public class Dokument {
         this.modul = modul;
     }
 
-    // Getter und Setter
     public int getDokumentId() {
         return dokumentId;
     }

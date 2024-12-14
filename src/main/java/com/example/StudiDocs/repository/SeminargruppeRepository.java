@@ -10,14 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface SeminargruppeRepository extends JpaRepository<Seminargruppe, Integer> {
-
-    // Methode zum Finden einer Seminargruppe anhand ihres Namens
     Optional<Seminargruppe> findByName(String name);
-
-    // Methode zum Finden von Seminargruppen basierend auf dem Studiengang
     List<Seminargruppe> findByStudiengang(Studiengang studiengang);  // Korrektur
     List<Seminargruppe> findByStudiengangStudiengangId(int studiengangId);
-
-    // Alle Seminargruppen abrufen
     List<Seminargruppe> findAll();
 }
