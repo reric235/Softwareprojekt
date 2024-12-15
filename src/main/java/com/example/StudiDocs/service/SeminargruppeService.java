@@ -1,11 +1,13 @@
 package com.example.StudiDocs.service;
 
+import com.example.StudiDocs.model.Kalender;
 import com.example.StudiDocs.model.Seminargruppe;
 import com.example.StudiDocs.model.Studiengang;
 import com.example.StudiDocs.repository.SeminargruppeRepository;
 import com.example.StudiDocs.repository.StudiengangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,27 +17,31 @@ public class SeminargruppeService {
 
     private final SeminargruppeRepository seminargruppeRepository;
     private final StudiengangRepository studiengangRepository;
+    private final KalenderService kalenderService;
 
     @Autowired
-    public SeminargruppeService(SeminargruppeRepository seminargruppeRepository, StudiengangRepository studiengangRepository) {
+    public SeminargruppeService(SeminargruppeRepository seminargruppeRepository, StudiengangRepository studiengangRepository, KalenderService kalenderService) {
         this.seminargruppeRepository = seminargruppeRepository;
         this.studiengangRepository = studiengangRepository;
+        this.kalenderService = kalenderService;
     }
 
-    /**
-     * Erstellt eine neue Seminargruppe und verknüpft sie mit einem Studiengang.
-     *
-     * @param seminargruppe Die zu erstellende Seminargruppe.
-     * @param studiengangId Die ID des zugehörigen Studiengangs.
-     * @return Die erstellte Seminargruppe.
-     */
+    @Transactional
     public Seminargruppe erstelleSeminargruppe(Seminargruppe seminargruppe, int studiengangId) {
         Optional<Studiengang> studiengangOptional = studiengangRepository.findById(studiengangId);
         if (studiengangOptional.isEmpty()) {
             throw new IllegalArgumentException("Studiengang mit der ID " + studiengangId + " existiert nicht.");
         }
+
         seminargruppe.setStudiengang(studiengangOptional.get());
-        return seminargruppeRepository.save(seminargruppe);
+        Seminargruppe savedSeminargruppe = seminargruppeRepository.save(seminargruppe);
+
+        // Kalender erstellen und speichern
+        Kalender kalender = new Kalender();
+        kalender.setSeminargruppe(savedSeminargruppe);
+        kalenderService.saveKalender(kalender);
+
+        return savedSeminargruppe;
     }
 
     /**
@@ -98,4 +104,6 @@ public class SeminargruppeService {
         }
         seminargruppeRepository.deleteById(seminargruppeId);
     }
+
+
 }

@@ -25,6 +25,10 @@ public class KalenderService {
         this.kalendereintragRepository = kalendereintragRepository;
     }
 
+    public Kalender saveKalender(Kalender kalender) {
+        return kalenderRepository.save(kalender);
+    }
+
     @Transactional
     public Kalendereintrag eintragenKalendereintrag(Kalendereintrag kalendereintrag) {
         if (!kalenderRepository.existsById(kalendereintrag.getKalender().getKalenderId())) {

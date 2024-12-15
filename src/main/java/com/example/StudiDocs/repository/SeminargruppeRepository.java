@@ -1,5 +1,6 @@
 package com.example.StudiDocs.repository;
 
+import com.example.StudiDocs.model.Kalender;
 import com.example.StudiDocs.model.Seminargruppe;
 import com.example.StudiDocs.model.Studiengang;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,4 +15,6 @@ public interface SeminargruppeRepository extends JpaRepository<Seminargruppe, In
     List<Seminargruppe> findByStudiengang(Studiengang studiengang);  // Korrektur
     List<Seminargruppe> findByStudiengangStudiengangId(int studiengangId);
     List<Seminargruppe> findAll();
+    @Override
+    Seminargruppe save(Seminargruppe seminargruppe);
 }

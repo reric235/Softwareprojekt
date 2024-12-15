@@ -129,6 +129,49 @@
             background-color: #0056b3;
         }
 
+        /* Zusätzliche Styles für die neue Seminargruppe-Sektion */
+        .seminargruppe-section {
+            margin-bottom: 40px;
+        }
+
+        .seminargruppe-section form {
+            background: #f9f9f9;
+            padding: 20px 25px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.05);
+        }
+
+        .seminargruppe-section label {
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .seminargruppe-section input,
+        .seminargruppe-section select,
+        .seminargruppe-section button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .seminargruppe-section button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .seminargruppe-section button:hover {
+            background-color: #0056b3;
+        }
+
         @media (min-width: 768px) {
             form {
                 display: flex;
@@ -143,12 +186,14 @@
             }
         }
     </style>
+    <!-- CSRF-Tokens für AJAX-Anfragen -->
     <meta name="_csrf" content="" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" content="" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 <div class="container">
 
+    <!-- Back-Link -->
     <a th:href="@{/index}" class="back-link" title="Zurück zur Übersicht">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
              stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
@@ -201,6 +246,7 @@
         <div class="message" id="message"></div>
     </section>
 
+    <!-- Student löschen -->
     <section>
         <h2>Student löschen</h2>
         <form id="deleteStudentForm">
@@ -213,6 +259,26 @@
         <div class="message" id="deleteMessage"></div>
     </section>
 
+    <!-- Seminargruppe hinzufügen -->
+    <section class="seminargruppe-section">
+        <h2>Seminargruppe hinzufügen</h2>
+        <form id="addSeminargruppeForm">
+            <div>
+                <label for="studiengangSelect">Studiengang:</label>
+                <select id="studiengangSelect" name="studiengangId" required>
+                    <option value="" disabled selected>Studiengang wählen...</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="seminargruppeName">Name der Seminargruppe:</label>
+                <input type="text" id="seminargruppeName" name="name" required placeholder="z.B. Seminargruppe A">
+            </div>
+
+            <button type="submit">Seminargruppe hinzufügen</button>
+        </form>
+        <div class="message" id="seminargruppeMessage"></div>
+    </section>
 
     <!-- Kalendereinträge verwalten -->
     <section>
@@ -280,6 +346,8 @@
     // Seminargruppen laden und in das Dropdown-Menü für die Registrierung einfügen
     async function loadSeminargruppen() {
         const seminargruppeSelect = document.getElementById('seminargruppe');
+        // Alle bestehenden Optionen außer der ersten (Platzhalter) entfernen
+        seminargruppeSelect.innerHTML = '<option value="" disabled selected>Seminargruppe wählen...</option>';
         try {
             const response = await fetch('/api/seminargruppen', {
                 headers: {
@@ -311,6 +379,8 @@
     // Rollen laden und in das Dropdown-Menü für die Registrierung einfügen
     async function loadRollen() {
         const rolleSelect = document.getElementById('rolle');
+        // Alle bestehenden Optionen außer der ersten (Platzhalter) entfernen
+        rolleSelect.innerHTML = '<option value="" disabled selected>Rolle wählen...</option>';
         try {
             const response = await fetch('/api/rollen', {
                 headers: {
@@ -339,7 +409,165 @@
         }
     }
 
-    // Registrierung absenden via AJAX
+    // Studiengänge laden und in das Dropdown-Menü für das Seminargruppe-Formular einfügen
+    async function loadStudiengaenge() {
+        const studiengangSelect = document.getElementById('studiengangSelect');
+        // Alle bestehenden Optionen außer der ersten (Platzhalter) entfernen
+        studiengangSelect.innerHTML = '<option value="" disabled selected>Studiengang wählen...</option>';
+        try {
+            const response = await fetch('/api/studiengaenge', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`Fehler beim Abrufen der Studiengänge: ${response.statusText}`);
+            }
+
+            const studiengaenge = await response.json();
+
+            if (studiengaenge.length === 0) {
+                alert("Keine Studiengänge verfügbar. Bitte kontaktiere den Administrator.");
+            }
+
+            studiengaenge.forEach(studiengang => {
+                const option = document.createElement('option');
+                option.value = studiengang.studiengangId;
+                option.textContent = studiengang.name;
+                studiengangSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Netzwerk- oder Serverfehler beim Laden der Studiengänge:', error);
+            alert("Fehler beim Abrufen der Studiengänge. Bitte später erneut versuchen.");
+        }
+    }
+
+    // Seminargruppen für den Kalender laden
+    async function fetchSeminargruppenForKalender() {
+        const seminargruppeSelect = document.getElementById('seminargruppeSelect');
+        // Alle bestehenden Optionen außer der ersten (Platzhalter) entfernen
+        seminargruppeSelect.innerHTML = '<option value="" disabled selected>Seminargruppe wählen...</option>';
+        try {
+            const response = await fetch('/api/seminargruppen', {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`Fehler beim Abrufen der Seminargruppen: ${response.statusText}`);
+            }
+
+            const seminargruppen = await response.json();
+
+            if (seminargruppen.length === 0) {
+                alert("Keine Seminargruppen verfügbar. Bitte kontaktiere den Administrator.");
+            }
+
+            seminargruppen.forEach(gruppe => {
+                const option = document.createElement('option');
+                option.value = gruppe.seminargruppeId;
+                option.textContent = gruppe.name;
+                seminargruppeSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Netzwerk- oder Serverfehler beim Laden der Seminargruppen:', error);
+            alert("Fehler beim Abrufen der Seminargruppen. Bitte später erneut versuchen.");
+        }
+    }
+
+    // Kalendereinträge laden und darstellen
+    async function fetchKalendereintraege() {
+        try {
+            const response = await fetch('/kalender/kalendereintraege');
+            if (!response.ok) {
+                throw new Error('Fehler beim Abrufen der Kalendereinträge');
+            }
+            const kalendereintraege = await response.json();
+            const tableBody = document.getElementById('kalendereintragTableBody');
+            tableBody.innerHTML = '';
+            kalendereintraege.forEach(eintrag => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${eintrag.kalendereintragId}</td>
+                        <td>${eintrag.beschreibung}</td>
+                        <td>${eintrag.eintragsdatum}</td>
+                        <td>${eintrag.startTime}</td>
+                        <td>${eintrag.endTime || '-'}</td>
+                        <td>${eintrag.eventType}</td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteKalendereintrag(${eintrag.kalendereintragId})">Löschen</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            displayMessage('kalendereintragMessage', error.message, 'error');
+        }
+    }
+
+    /**
+     * Formularübermittlung für das Hinzufügen einer Seminargruppe via AJAX.
+     */
+    document.getElementById('addSeminargruppeForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const studiengangId = parseInt(document.getElementById('studiengangSelect').value);
+        const name = document.getElementById('seminargruppeName').value.trim();
+
+        const messageEl = document.getElementById('seminargruppeMessage');
+        messageEl.textContent = '';
+        messageEl.className = 'message';
+
+        if (!name || !studiengangId) {
+            messageEl.textContent = 'Bitte alle Felder ausfüllen.';
+            messageEl.classList.add('error');
+            messageEl.style.display = 'block';
+            return;
+        }
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        try {
+            const response = await fetch('/api/seminargruppen', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken
+                },
+                body: JSON.stringify({
+                    seminargruppe: {
+                        name: name
+                    },
+                    studiengangId: studiengangId
+                })
+            });
+
+            if (response.ok) {
+                const responseText = await response.text();
+                messageEl.textContent = responseText || 'Seminargruppe erfolgreich erstellt.';
+                messageEl.classList.add('success');
+                messageEl.style.display = 'block';
+                document.getElementById('addSeminargruppeForm').reset();
+                loadSeminargruppen(); // Aktualisiert Seminargruppen in der Registrierung
+                fetchSeminargruppenForKalender(); // Aktualisiert Seminargruppen im Kalender
+                fetchKalendereintraege(); // Optional: Aktualisiert Kalendereinträge
+            } else {
+                const errorObj = await response.json();
+                messageEl.textContent = `Fehler: ${errorObj.error || 'Erstellung fehlgeschlagen.'}`;
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        } catch (error) {
+            messageEl.textContent = `Netzwerkfehler: ${error.message}`;
+            messageEl.classList.add('error');
+            messageEl.style.display = 'block';
+        }
+    });
+
+    /**
+     * Formularübermittlung für die Registrierung eines Studenten via AJAX.
+     */
     document.getElementById('registrationForm').addEventListener('submit', async function(event) {
         event.preventDefault();
 
@@ -374,128 +602,23 @@
             if (response.ok) {
                 messageEl.textContent = responseText || 'Student erfolgreich registriert.';
                 messageEl.classList.add('success');
+                messageEl.style.display = 'block';
                 document.getElementById('registrationForm').reset();
             } else {
                 messageEl.textContent = `Fehler: ${responseText || 'Registrierung fehlgeschlagen.'}`;
                 messageEl.classList.add('error');
+                messageEl.style.display = 'block';
             }
         } catch (error) {
             messageEl.textContent = `Netzwerkfehler: ${error.message}`;
             messageEl.classList.add('error');
+            messageEl.style.display = 'block';
         }
     });
 
-    // Seminargruppen für den Kalender laden
-    async function fetchSeminargruppenForKalender() {
-        try {
-            const response = await fetch('/kalender/seminargruppen');
-            if (!response.ok) throw new Error('Fehler beim Laden der Seminargruppen.');
-            const seminargruppen = await response.json();
-            const select = document.getElementById('seminargruppeSelect');
-            select.innerHTML = '<option value="" disabled selected>Seminargruppe wählen...</option>';
-            seminargruppen.forEach(gruppe => {
-                const option = document.createElement('option');
-                option.value = gruppe.seminargruppeId;
-                option.textContent = gruppe.name;
-                select.appendChild(option);
-            });
-        } catch (error) {
-            alert('Fehler beim Laden der Seminargruppen.');
-            console.error(error);
-        }
-    }
-
-    // Kalendereinträge laden und darstellen
-    async function fetchKalendereintraege() {
-        try {
-            const response = await fetch('/kalender/kalendereintraege');
-            if (!response.ok) {
-                throw new Error('Fehler beim Abrufen der Kalendereinträge');
-            }
-            const kalendereintraege = await response.json();
-            const tableBody = document.getElementById('kalendereintragTableBody');
-            tableBody.innerHTML = '';
-            kalendereintraege.forEach(eintrag => {
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>${eintrag.kalendereintragId}</td>
-                        <td>${eintrag.beschreibung}</td>
-                        <td>${eintrag.eintragsdatum}</td>
-                        <td>${eintrag.startTime}</td>
-                        <td>${eintrag.endTime}</td>
-                        <td>${eintrag.eventType}</td>
-                        <td>
-                            <button class="delete-btn" onclick="deleteKalendereintrag(${eintrag.kalendereintragId})">Löschen</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        } catch (error) {
-            displayMessage('kalendereintragMessage', error.message, 'error');
-        }
-    }
-
-    async function addKalendereintrag(beschreibung, eintragsdatum, eventType, startTime, endTime, seminargruppeId) {
-        try {
-            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-            const payload = { beschreibung, eintragsdatum, eventType, startTime, endTime, seminargruppeId };
-            const response = await fetch('/kalender/kalendereintrag', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    [csrfHeader]: csrfToken
-                },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) {
-                const errorObj = await response.json();
-                throw new Error(errorObj.error || 'Fehler beim Hinzufügen des Kalendereintrags.');
-            }
-            displayMessage('kalendereintragMessage', 'Kalendereintrag erfolgreich hinzugefügt!', 'success');
-            fetchKalendereintraege();
-        } catch (error) {
-            displayMessage('kalendereintragMessage', error.message, 'error');
-            console.error('Fehler beim Hinzufügen des Kalendereintrags:', error);
-        }
-    }
-
-    async function deleteKalendereintrag(kalendereintragId) {
-        if (!confirm('Sind Sie sicher, dass Sie diesen Kalendereintrag löschen möchten?')) return;
-
-        try {
-            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
-            const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
-
-            const response = await fetch(`/kalender/kalendereintrag/${kalendereintragId}`, {
-                method: 'DELETE',
-                headers: {
-                    [csrfHeader]: csrfToken
-                }
-            });
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(errorText || 'Fehler beim Löschen des Kalendereintrags.');
-            }
-            displayMessage('kalendereintragMessage', 'Kalendereintrag erfolgreich gelöscht!', 'success');
-            fetchKalendereintraege();
-        } catch (error) {
-            displayMessage('kalendereintragMessage', error.message, 'error');
-        }
-    }
-
-    function displayMessage(elementId, message, type) {
-        const messageEl = document.getElementById(elementId);
-        messageEl.textContent = message;
-        messageEl.className = `message ${type}`;
-        messageEl.style.display = 'block';
-        setTimeout(() => {
-            messageEl.style.display = 'none';
-        }, 5000);
-    }
-
-    // Neuer Code für das Löschen eines Studenten per E-Mail
+    /**
+     * Formularübermittlung für das Löschen eines Studenten per E-Mail via AJAX.
+     */
     document.getElementById('deleteStudentForm').addEventListener('submit', async function(event) {
         event.preventDefault();
         const emailToDelete = document.getElementById('deleteEmail').value.trim();
@@ -506,6 +629,7 @@
         if (!emailToDelete) {
             messageEl.textContent = 'Bitte eine E-Mail-Adresse eingeben.';
             messageEl.classList.add('error');
+            messageEl.style.display = 'block';
             return;
         }
 
@@ -524,29 +648,77 @@
                 const responseText = await response.text();
                 messageEl.textContent = responseText || 'Student erfolgreich gelöscht.';
                 messageEl.classList.add('success');
+                messageEl.style.display = 'block';
                 document.getElementById('deleteStudentForm').reset();
             } else if (response.status === 404) {
                 messageEl.textContent = 'Kein Student mit dieser E-Mail gefunden.';
                 messageEl.classList.add('error');
+                messageEl.style.display = 'block';
             } else {
                 const errorText = await response.text();
                 messageEl.textContent = `Fehler: ${errorText || 'Löschen fehlgeschlagen.'}`;
                 messageEl.classList.add('error');
+                messageEl.style.display = 'block';
             }
         } catch (error) {
             messageEl.textContent = `Netzwerkfehler: ${error.message}`;
             messageEl.classList.add('error');
+            messageEl.style.display = 'block';
         }
     });
+
+    /**
+     * Funktion zur Anzeige von Meldungen.
+     *
+     * @param {string} elementId - Die ID des Elements, in dem die Nachricht angezeigt wird.
+     * @param {string} message - Die anzuzeigende Nachricht.
+     * @param {string} type - Der Typ der Nachricht ('success' oder 'error').
+     */
+    function displayMessage(elementId, message, type) {
+        const messageEl = document.getElementById(elementId);
+        messageEl.textContent = message;
+        messageEl.className = `message ${type}`;
+        messageEl.style.display = 'block';
+        setTimeout(() => {
+            messageEl.style.display = 'none';
+        }, 5000);
+    }
+
+    // Kalendereintrag löschen Funktion
+    async function deleteKalendereintrag(kalendereintragId) {
+        if (!confirm('Sind Sie sicher, dass Sie diesen Kalendereintrag löschen möchten?')) return;
+
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        try {
+            const response = await fetch(`/kalender/kalendereintrag/${kalendereintragId}`, {
+                method: 'DELETE',
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
+            });
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(errorText || 'Fehler beim Löschen des Kalendereintrags.');
+            }
+            displayMessage('kalendereintragMessage', 'Kalendereintrag erfolgreich gelöscht!', 'success');
+            fetchKalendereintraege();
+        } catch (error) {
+            displayMessage('kalendereintragMessage', error.message, 'error');
+        }
+    }
 
     window.onload = function () {
         loadSeminargruppen();
         loadRollen();
+        loadStudiengaenge(); // Neue Funktion aufrufen
         fetchSeminargruppenForKalender();
         fetchKalendereintraege();
     };
 </script>
 <script>
+    // CSRF-Token und Header abrufen (optional, falls benötigt)
     const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
 </script>
