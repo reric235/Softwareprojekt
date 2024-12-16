@@ -5,7 +5,8 @@ import com.example.StudiDocs.service.SeminargruppeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +42,10 @@ public class SeminargruppeController {
             Seminargruppe seminargruppe = new Seminargruppe();
             seminargruppe.setName(name);
 
-            seminargruppeService.erstelleSeminargruppe(seminargruppe, studiengangId);
-            return ResponseEntity.ok("Seminargruppe erfolgreich erstellt.");
+            Seminargruppe neueSeminargruppe = seminargruppeService.erstelleSeminargruppe(seminargruppe, studiengangId);
+            URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                    .buildAndExpand(neueSeminargruppe.getSeminargruppeId()).toUri();
+            return ResponseEntity.created(location).body(neueSeminargruppe);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }

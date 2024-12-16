@@ -8,7 +8,6 @@ import com.example.StudiDocs.repository.StudiengangRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -36,7 +35,6 @@ public class SeminargruppeService {
         seminargruppe.setStudiengang(studiengangOptional.get());
         Seminargruppe savedSeminargruppe = seminargruppeRepository.save(seminargruppe);
 
-        // Kalender erstellen und speichern
         Kalender kalender = new Kalender();
         kalender.setSeminargruppe(savedSeminargruppe);
         kalenderService.saveKalender(kalender);
@@ -44,22 +42,6 @@ public class SeminargruppeService {
         return savedSeminargruppe;
     }
 
-    /**
-     * Findet eine Seminargruppe anhand ihres Namens.
-     *
-     * @param name Der Name der Seminargruppe.
-     * @return Optional mit der gefundenen Seminargruppe.
-     */
-    public Optional<Seminargruppe> findeSeminargruppeByName(String name) {
-        return seminargruppeRepository.findByName(name);
-    }
-
-    /**
-     * Sucht alle Seminargruppen, die zu einem bestimmten Studiengang gehören.
-     *
-     * @param studiengangId Die ID des Studiengangs.
-     * @return Liste der Seminargruppen.
-     */
     public List<Seminargruppe> findeSeminargruppenByStudiengang(int studiengangId) {
         Optional<Studiengang> studiengangOptional = studiengangRepository.findById(studiengangId);
         if (studiengangOptional.isEmpty()) {
@@ -71,39 +53,14 @@ public class SeminargruppeService {
         return seminargruppeRepository.findById(id);
     }
 
-    /**
-     * Gibt alle Seminargruppen zurück.
-     *
-     * @return Liste aller Seminargruppen.
-     */
     public List<Seminargruppe> findeAlleSeminargruppen() {
         return seminargruppeRepository.findAll();
     }
 
-    /**
-     * Aktualisiert eine bestehende Seminargruppe.
-     *
-     * @param seminargruppe Die Seminargruppe mit aktualisierten Daten.
-     * @return Die aktualisierte Seminargruppe.
-     */
-    public Seminargruppe aktualisiereSeminargruppe(Seminargruppe seminargruppe) {
-        if (!seminargruppeRepository.existsById(seminargruppe.getSeminargruppeId())) {
-            throw new IllegalArgumentException("Seminargruppe mit der ID " + seminargruppe.getSeminargruppeId() + " existiert nicht.");
-        }
-        return seminargruppeRepository.save(seminargruppe);
-    }
-
-    /**
-     * Löscht eine Seminargruppe anhand ihrer ID.
-     *
-     * @param seminargruppeId Die ID der zu löschenden Seminargruppe.
-     */
     public void loescheSeminargruppe(int seminargruppeId) {
         if (!seminargruppeRepository.existsById(seminargruppeId)) {
             throw new IllegalArgumentException("Seminargruppe mit der ID " + seminargruppeId + " existiert nicht.");
         }
         seminargruppeRepository.deleteById(seminargruppeId);
     }
-
-
 }

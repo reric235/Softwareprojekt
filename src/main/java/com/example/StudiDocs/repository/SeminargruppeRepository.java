@@ -1,11 +1,9 @@
 package com.example.StudiDocs.repository;
 
-import com.example.StudiDocs.model.Kalender;
 import com.example.StudiDocs.model.Seminargruppe;
 import com.example.StudiDocs.model.Studiengang;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
 import java.util.List;
 import java.util.Optional;
 

@@ -81,8 +81,7 @@ public class DokumentController {
             dokumentService.loescheDokument(dokumentId, student);
             return ResponseEntity.ok("Dokument erfolgreich gelöscht.");
         } catch (IllegalArgumentException | IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
+            return ResponseEntity.badRequest().body("Dokument existiert nicht.");        }
     }
 
     @GetMapping("/modul/{modulId}")
@@ -111,7 +110,6 @@ public class DokumentController {
             if (!resource.exists() || !resource.isReadable()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
-
             String filename = dokument.getName();
 
             return ResponseEntity.ok()

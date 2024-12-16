@@ -52,10 +52,6 @@ public class KalenderService {
         }
     }
 
-    public List<Kalendereintrag> getAlleKalendereintraege() {
-        return kalendereintragRepository.findAll();
-    }
-
     public List<Kalendereintrag> findeKalendereintraegeByKalender(int kalenderId) {
         return kalendereintragRepository.findByKalenderKalenderId(kalenderId);
     }

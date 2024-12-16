@@ -27,6 +27,12 @@ public class Seminargruppe {
 
     public Seminargruppe() {}
 
+    public Seminargruppe(int seminargruppeId, String name, Studiengang studiengang) {
+        this.seminargruppeId = seminargruppeId;
+        this.name = name;
+        this.studiengang = studiengang;
+    }
+
     public int getSeminargruppeId() {
         return seminargruppeId;
     }
@@ -49,28 +55,6 @@ public class Seminargruppe {
 
     public void setStudiengang(Studiengang studiengang) {
         this.studiengang = studiengang;
-    }
-
-    public List<Student> getStudenten() {
-        return studenten;
-    }
-
-    public void setStudenten(List<Student> studenten) {
-        this.studenten = studenten;
-    }
-
-    public void addStudent(Student student) {
-        if (!studenten.contains(student)) {
-            studenten.add(student);
-            student.setSeminargruppe(this);
-        }
-    }
-
-    public void removeStudent(Student student) {
-        if (studenten.contains(student)) {
-            studenten.remove(student);
-            student.setSeminargruppe(null);
-        }
     }
 
     @Override

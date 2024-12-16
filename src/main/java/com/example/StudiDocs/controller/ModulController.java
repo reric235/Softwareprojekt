@@ -36,16 +36,6 @@ public class ModulController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("/{modulId}")
-    public ResponseEntity<String> loescheModul(@PathVariable int modulId) {
-        try {
-            modulService.loescheModul(modulId);
-            return ResponseEntity.ok("Modul erfolgreich gelöscht");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
-    }
-
     @GetMapping("/semester/{semester}")
     public ResponseEntity<List<Modul>> getModuleBySemester(@PathVariable int semester) {
         List<Modul> module = modulService.findBySemester(semester);

@@ -1,5 +1,3 @@
-// src/main/java/com/example/StudiDocs/service/CustomUserDetailsService.java
-
 package com.example.StudiDocs.service;
 
 import com.example.StudiDocs.model.Student;

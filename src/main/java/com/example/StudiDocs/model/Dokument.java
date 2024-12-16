@@ -39,6 +39,8 @@ public class Dokument {
 
     public Dokument() {}
 
+    public Dokument(String name, String filePath, Student student, Modul modul) {}
+
     public Dokument(String name, Date uploadDatum, long size, String filePath, Student student, Modul modul) {
         this.name = name;
         this.uploadDatum = uploadDatum;

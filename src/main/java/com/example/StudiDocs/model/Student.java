@@ -52,6 +52,15 @@ public class Student {
         this.rolle = Rolle.STUDENT;
     }
 
+    public Student(String vorname, String nachname, String email, String passwort, int seminargruppeId, Rolle rolle) {
+        this.vorname = vorname;
+        this.nachname = nachname;
+        this.email = email;
+        this.passwort = passwort;
+        this.seminargruppeId = seminargruppeId;
+        this.rolle = rolle;
+    }
+
     public int getStudentId() {
         return studentId;
     }
@@ -118,14 +127,6 @@ public class Student {
 
     public void setSeminargruppe(Seminargruppe seminargruppe) {
         this.seminargruppe = seminargruppe;
-    }
-
-    public List<Kalendereintrag> getKalendereintraege() {
-        return kalendereintraege;
-    }
-
-    public void setKalendereintraege(List<Kalendereintrag> kalendereintraege) {
-        this.kalendereintraege = kalendereintraege;
     }
 
     public boolean getVerifiziert() {

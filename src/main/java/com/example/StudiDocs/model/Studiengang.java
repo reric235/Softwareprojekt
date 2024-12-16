@@ -3,9 +3,6 @@ package com.example.StudiDocs.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.util.List;
-import java.util.Objects;
-
-import java.util.List;
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -21,14 +18,12 @@ public class Studiengang {
     @OneToMany(mappedBy = "studiengang", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Modul> module;
 
-    // Standard-Konstruktor
     public Studiengang() {
     }
 
-    // Getter und Setter
-
-    public int getStudiengangId() {
-        return studiengangId;
+    public Studiengang(int studiengangId, String name) {
+        this.studiengangId = studiengangId;
+        this.name = name;
     }
 
     public void setStudiengangId(int studiengangId) {
@@ -41,13 +36,5 @@ public class Studiengang {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<Modul> getModule() {
-        return module;
-    }
-
-    public void setModule(List<Modul> module) {
-        this.module = module;
     }
 }
