@@ -28,4 +28,8 @@ public class ModulService {
     public List<Modul> findBySemester(int semester) {
         return modulRepository.findBySemester(semester);
     }
+
+    public List<Modul> findModulesByStudiengangAndSemester(int studiengangId, int semester) {
+        return modulRepository.findByStudiengang_StudiengangIdAndSemester(studiengangId, semester);
+    }
 }

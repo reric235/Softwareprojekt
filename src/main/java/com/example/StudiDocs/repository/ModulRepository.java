@@ -8,9 +8,8 @@ import java.util.List;
 @Repository
 public interface ModulRepository extends JpaRepository<Modul, Integer> {
 
-    List<Modul> findByStudiengangAndSemester(String studiengang, int semester);
+    List<Modul> findByStudiengang_StudiengangIdAndSemester(int studiengangId, int semester);
     List<Modul> findByModulname(String modulname);
     List<Modul> findBySemester(int semester);
-    @Override
     Modul save(Modul modul);
 }

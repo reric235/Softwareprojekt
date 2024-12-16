@@ -165,108 +165,88 @@
         let userEmail = null;
         let userRole = null;
 
+        // Funktion zum Laden des aktuellen Benutzers
         async function loadCurrentUser() {
-            try {
-                const response = await fetch('/api/students/current');
-                if (!response.ok) throw new Error('Fehler beim Laden des aktuellen Benutzers.');
-                const userData = await response.json();
-                userEmail = userData.email;
-                userRole = userData.rolle;
-            } catch (error) {
-                console.error(error);
-                alert('Konnte aktuellen Benutzer nicht laden. Evtl. nicht eingeloggt?');
-            }
+            const response = await fetch('/api/students/current');
+            const userData = await response.json();
+            userEmail = userData.email;
+            userRole = userData.rolle;
         }
 
+        // Funktion zum Laden der Module basierend auf dem ausgewählten Semester und dem Studiengang des Benutzers
         async function loadModules(semester) {
-            try {
-                const response = await fetch(`/api/modul/semester/${semester}`);
-                if (!response.ok) throw new Error('Fehler beim Laden der Module.');
-                const modules = await response.json();
+            const response = await fetch(`/api/modul/semester/${semester}`);
+            const modules = await response.json();
 
-                modulSelect.innerHTML = '<option value="" disabled selected>Wähle ein Modul...</option>';
-                modules.forEach(modul => {
-                    const option = document.createElement('option');
-                    option.value = modul.modulId;
-                    option.textContent = modul.modulname;
-                    modulSelect.appendChild(option);
-                });
-                modulSelect.disabled = false;
-            } catch (error) {
-                console.error(error);
-                alert('Module konnten nicht geladen werden.');
-            }
+            modulSelect.innerHTML = '<option value="" disabled selected>Wähle ein Modul...</option>';
+            modules.forEach(modul => {
+                const option = document.createElement('option');
+                option.value = modul.modulId;
+                option.textContent = modul.modulname;
+                modulSelect.appendChild(option);
+            });
+            modulSelect.disabled = false;
         }
 
+        // Funktion zum Laden der Dokumente basierend auf dem ausgewählten Modul und der Sortierung
         async function loadDocuments(modulId) {
-            try {
-                let url = `/api/dokumente/modul/${modulId}`;
-                if (selectedSortParam) {
-                    url += `?sort=${encodeURIComponent(selectedSortParam)}`;
+            let url = `/api/dokumente/modul/${modulId}`;
+            if (selectedSortParam) {
+                url += `?sort=${encodeURIComponent(selectedSortParam)}`;
+            }
+
+            const response = await fetch(url);
+            const documents = await response.json();
+            documentTable.innerHTML = ''; // Alte Daten entfernen
+
+            for (const doc of documents) {
+                // Eigentümer-Daten laden
+                const ownerResponse = await fetch(`/api/students/by-dokument/${doc.dokumentId}`);
+                const owner = await ownerResponse.json();
+
+                // Entscheiden, ob der Löschen-Button gezeigt werden soll:
+                let loeschenButtonHtml = '';
+                // Check: ADMIN darf alle löschen
+                // STUDENT oder STUDENTENRAT darf nur löschen, wenn owner.email == userEmail
+                if (userRole === 'ADMIN' || ((userRole === 'STUDENT' || userRole === 'STUDENTENRAT') && owner.email === userEmail)) {
+                    loeschenButtonHtml = `<button class="delete-btn" onclick="deleteDokument(${doc.dokumentId})">Löschen</button>`;
                 }
 
-                const response = await fetch(url);
-                if (!response.ok) throw new Error('Fehler beim Laden der Dokumente.');
-
-                const documents = await response.json();
-                documentTable.innerHTML = ''; // Alte Daten entfernen
-
-                for (const doc of documents) {
-                    // Eigentümer-Daten laden
-                    const ownerResponse = await fetch(`/api/students/by-dokument/${doc.dokumentId}`);
-                    if (!ownerResponse.ok) throw new Error('Fehler beim Laden des Eigentümers.');
-                    const owner = await ownerResponse.json();
-
-                    // Entscheiden, ob der Löschen-Button gezeigt werden soll:
-                    let loeschenButtonHtml = '';
-                    // Check: ADMIN darf alle löschen
-                    // STUDENT oder STUDENTENRAT darf nur löschen, wenn owner.email == userEmail
-                    if (userRole === 'ADMIN' || ((userRole === 'STUDENT' || userRole === 'STUDENTENRAT') && owner.email === userEmail)) {
-                        loeschenButtonHtml = `<button class="delete-btn" onclick="deleteDokument(${doc.dokumentId})">Löschen</button>`;
-                    }
-
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${doc.name}</td>
-                        <td>${new Date(doc.uploadDatum).toLocaleDateString('de-DE')}</td>
-                        <td>${owner.vorname} ${owner.nachname}</td>
-                        <td>${(doc.size / 1024).toFixed(2)} KB</td>
-                        <td><a href="/api/dokumente/download/${doc.dokumentId}" download>Download</a></td>
-                        <td>${loeschenButtonHtml}</td>
-                    `;
-                    documentTable.appendChild(row);
-                }
-            } catch (error) {
-                alert('Fehler beim Laden der Dokumente.');
-                console.error(error);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${doc.name}</td>
+                    <td>${new Date(doc.uploadDatum).toLocaleDateString('de-DE')}</td>
+                    <td>${owner.vorname} ${owner.nachname}</td>
+                    <td>${(doc.size / 1024).toFixed(2)} KB</td>
+                    <td><a href="/api/dokumente/download/${doc.dokumentId}" download>Download</a></td>
+                    <td>${loeschenButtonHtml}</td>
+                `;
+                documentTable.appendChild(row);
             }
         }
 
-        // Neue Funktion zum Löschen eines Dokuments
+        // Funktion zum Löschen eines Dokuments
         window.deleteDokument = async function(dokumentId) {
             if (!confirm('Sind Sie sicher, dass Sie dieses Dokument löschen möchten?')) return;
 
-            try {
-                const response = await fetch(`/api/dokumente/${dokumentId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        [csrfHeader]: csrfToken
-                    }
-                });
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(errorText || 'Fehler beim Löschen des Dokuments.');
+            const response = await fetch(`/api/dokumente/${dokumentId}`, {
+                method: 'DELETE',
+                headers: {
+                    [csrfHeader]: csrfToken
                 }
+            });
+            if (response.ok) {
                 alert('Dokument erfolgreich gelöscht.');
                 if (selectedModulId) {
                     loadDocuments(selectedModulId);
                 }
-            } catch (error) {
-                alert(error.message);
-                console.error(error);
+            } else {
+                const errorText = await response.text();
+                alert(errorText || 'Fehler beim Löschen des Dokuments.');
             }
         };
 
+        // Event Listener für die Semester-Auswahl
         semesterSelect.addEventListener('change', function () {
             const semester = this.value;
             if (semester) {
@@ -274,6 +254,7 @@
             }
         });
 
+        // Event Listener für die Modul-Auswahl
         modulSelect.addEventListener('change', function () {
             selectedModulId = this.value;
             if (selectedModulId) {
@@ -281,6 +262,7 @@
             }
         });
 
+        // Event Listener für das Hochladen eines Dokuments
         uploadForm.addEventListener('submit', async function (e) {
             e.preventDefault();
             if (!selectedModulId) {
@@ -289,24 +271,24 @@
             }
             const formData = new FormData(uploadForm);
             formData.append('modulId', selectedModulId);
-            try {
-                const response = await fetch('/api/dokumente/upload', {
-                    method: 'POST',
-                    headers: {
-                        [csrfHeader]: csrfToken
-                    },
-                    body: formData
-                });
-                if (!response.ok) throw new Error('Fehler beim Hochladen der Datei.');
+            const response = await fetch('/api/dokumente/upload', {
+                method: 'POST',
+                headers: {
+                    [csrfHeader]: csrfToken
+                },
+                body: formData
+            });
+            if (response.ok) {
                 alert('Dokument erfolgreich hochgeladen.');
                 uploadForm.reset();
                 loadDocuments(selectedModulId);
-            } catch (error) {
-                alert(error.message);
-                console.error(error);
+            } else {
+                const errorText = await response.text();
+                alert(errorText || 'Fehler beim Hochladen der Datei.');
             }
         });
 
+        // Event Listener für die Sortierungsauswahl
         sortSelect.addEventListener('change', function () {
             selectedSortParam = sortSelect.value;
             if (selectedModulId) {
@@ -314,8 +296,8 @@
             }
         });
 
-        // Zuerst den aktuellen User laden, dann ist userRole/userEmail bekannt
-        await loadCurrentUser();
+        // Initiales Laden des aktuellen Benutzers
+        loadCurrentUser();
     });
 </script>
 <script>
