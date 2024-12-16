@@ -37,4 +37,9 @@ public class Studiengang {
     public void setName(String name) {
         this.name = name;
     }
+
+    public int getStudiengangId() {
+        return studiengangId;
+    }
+
 }

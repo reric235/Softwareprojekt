@@ -1,6 +1,7 @@
 package com.example.StudiDocs.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import java.util.List;
@@ -23,6 +24,7 @@ public class Student {
     private String email;
 
     @Column(nullable = false)
+    @JsonIgnore
     private String passwort;
 
     @Enumerated(EnumType.STRING)

@@ -505,20 +505,21 @@
         }
     }
 
-    /**
-     * Formularübermittlung für das Hinzufügen einer Seminargruppe via AJAX.
-     */
     document.getElementById('addSeminargruppeForm').addEventListener('submit', async function(event) {
         event.preventDefault();
 
         const studiengangId = parseInt(document.getElementById('studiengangSelect').value);
         const name = document.getElementById('seminargruppeName').value.trim();
 
+        console.log("StudiengangId:", studiengangId);
+        console.log("Name:", name);
+
         const messageEl = document.getElementById('seminargruppeMessage');
         messageEl.textContent = '';
         messageEl.className = 'message';
 
         if (!name || !studiengangId) {
+            console.log("Fehlende Eingabe erkannt.");
             messageEl.textContent = 'Bitte alle Felder ausfüllen.';
             messageEl.classList.add('error');
             messageEl.style.display = 'block';
@@ -543,31 +544,32 @@
                 })
             });
 
+            console.log("Response-Status:", response.status);
+
             if (response.ok) {
-                const responseText = await response.text();
-                messageEl.textContent = responseText || 'Seminargruppe erfolgreich erstellt.';
+                const responseData = await response.json();
+                console.log("Erfolgreich erstellt:", responseData);
+                messageEl.textContent = `Seminargruppe "${responseData.name}" erfolgreich erstellt.`;
                 messageEl.classList.add('success');
                 messageEl.style.display = 'block';
+
                 document.getElementById('addSeminargruppeForm').reset();
-                loadSeminargruppen(); // Aktualisiert Seminargruppen in der Registrierung
-                fetchSeminargruppenForKalender(); // Aktualisiert Seminargruppen im Kalender
-                fetchKalendereintraege(); // Optional: Aktualisiert Kalendereinträge
+                loadSeminargruppen();
             } else {
-                const errorObj = await response.json();
-                messageEl.textContent = `Fehler: ${errorObj.error || 'Erstellung fehlgeschlagen.'}`;
+                const errorData = await response.json();
+                console.log("Fehler beim Server:", errorData);
+                messageEl.textContent = `Fehler: ${errorData.error || 'Seminargruppe konnte nicht erstellt werden.'}`;
                 messageEl.classList.add('error');
                 messageEl.style.display = 'block';
             }
         } catch (error) {
+            console.log("Netzwerkfehler:", error);
             messageEl.textContent = `Netzwerkfehler: ${error.message}`;
             messageEl.classList.add('error');
             messageEl.style.display = 'block';
         }
     });
 
-    /**
-     * Formularübermittlung für die Registrierung eines Studenten via AJAX.
-     */
     document.getElementById('registrationForm').addEventListener('submit', async function(event) {
         event.preventDefault();
 
@@ -616,9 +618,6 @@
         }
     });
 
-    /**
-     * Formularübermittlung für das Löschen eines Studenten per E-Mail via AJAX.
-     */
     document.getElementById('deleteStudentForm').addEventListener('submit', async function(event) {
         event.preventDefault();
         const emailToDelete = document.getElementById('deleteEmail').value.trim();
