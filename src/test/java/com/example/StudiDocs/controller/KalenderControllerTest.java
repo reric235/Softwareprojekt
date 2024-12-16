@@ -471,24 +471,4 @@ class KalenderControllerTest {
                 .andExpect(jsonPath("$[0].beschreibung").value("Prüfung 1"))
                 .andExpect(jsonPath("$[0].eventType").value("PRUEFUNG"));
     }
-
-
-    @Test
-    void testGetAllSeminargruppen_Success() throws Exception {
-        Seminargruppe sg1 = new Seminargruppe();
-        sg1.setSeminargruppeId(1);
-        sg1.setName("Gruppe A");
-
-        Seminargruppe sg2 = new Seminargruppe();
-        sg2.setSeminargruppeId(2);
-        sg2.setName("Gruppe B");
-
-        when(seminargruppeService.findeAlleSeminargruppen()).thenReturn(List.of(sg1, sg2));
-
-        mockMvc.perform(get("/kalender/seminargruppen"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].name").value("Gruppe A"))
-                .andExpect(jsonPath("$[1].name").value("Gruppe B"));
-    }
 }

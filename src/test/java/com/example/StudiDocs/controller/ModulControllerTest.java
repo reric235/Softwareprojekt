@@ -3,8 +3,8 @@ package com.example.StudiDocs.controller;
 import com.example.StudiDocs.model.Modul;
 import com.example.StudiDocs.model.Studiengang;
 import com.example.StudiDocs.repository.StudentRepository;
+import com.example.StudiDocs.repository.StudiengangRepository;
 import com.example.StudiDocs.service.ModulService;
-import com.example.StudiDocs.service.StudiengangService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.test.web.servlet.MockMvc;
@@ -72,14 +72,14 @@ class ModulControllerTest {
     @Test
     void testGetModulById_Found() throws Exception {
         ModulService modulService = Mockito.mock(ModulService.class);
-        StudiengangService studiengangService = Mockito.mock(StudiengangService.class);
         StudentRepository studentRepository = Mockito.mock(StudentRepository.class);
+        Studiengang studiengang = Mockito.mock(Studiengang.class);
 
         Modul m = new Modul();
         m.setModulId(1);
         m.setModulname("Mathe1");
         m.setSemester(1);
-        m.setStudiengang(new Studiengang());
+        m.setStudiengang(studiengang);
 
         Mockito.when(modulService.findeModulById(1)).thenReturn(Optional.of(m));
 
