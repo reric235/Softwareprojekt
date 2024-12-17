@@ -15,7 +15,6 @@ class StudentenratControllerTest {
     void testShowStudentenratPage() throws Exception {
         StudentenratController controller = new StudentenratController();
 
-        // Simple ViewResolver configuration for tests
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
         viewResolver.setPrefix("/templates/");
         viewResolver.setSuffix(".html");
