@@ -4,132 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kompakter Kalender</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 90%;
-            max-width: 1000px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-        h1 {
-            text-align: center;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-        }
-        .controls {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .controls button {
-            padding: 8px 12px;
-            margin: 0 5px;
-            font-size: 14px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .controls button:hover {
-            background-color: #0056b3;
-        }
-        .month-year, .week-range {
-            text-align: center;
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-        #calendar {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            grid-gap: 1px;
-            background-color: #ccc;
-            font-size: 0.85rem;
-        }
-        #calendar div {
-            background: #fff;
-            padding: 5px;
-            text-align: left;
-            border: 1px solid #ccc;
-            min-height: 60px;
-            position: relative;
-        }
-        #calendar .header {
-            background: #007BFF;
-            color: white;
-            font-weight: bold;
-            padding: 5px 0;
-            text-align: center;
-        }
-        #calendar .day-number {
-            position: absolute;
-            top: 10px;
-            left: 5px;
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-        .event {
-            padding: 5px;
-            margin-top: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 0.8rem;
-        }
-        .admin {
-            background-color: #17a2b8;
-        }
-        .admin:hover {
-            background-color: #138496;
-        }
-
-        /* Back-Link Pfeil */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            background-color: #007BFF;
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-
-        .back-link:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-<div class="container">
-    <a th:href="@{/index}" class="back-link" title="Zurück zur Übersicht">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-             stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 6 L8 12 L14 18" />
-        </svg>
-    </a>
+<div class="fullcontainer">
+    <a th:href="@{/index}" class="top-left-button" title="Zurück zur Übersicht">Zurück zur Übersicht</a>
     <h1>Kompakter Kalender</h1>
+    <div class="block">
 
-    <div class="month-year" id="monthYearDisplay"></div>
-    <div class="week-range" id="weekRangeDisplay" style="display: none;"></div>
+        <div class="month-year" id="monthYearDisplay"></div>
+        <div class="week-range" id="weekRangeDisplay" style="display: none;">
+            <h1 id="weekRangeHeading">Woche: </h1>
+        </div>
 
-    <div class="controls">
-        <button id="prev">Zurück</button>
-        <button id="next">Vorwärts</button>
-        <button id="toggleView">Zur Wochenansicht wechseln</button>
+        <div class="controls">
+            <button id="prev" class="buttons">Zurück</button>
+            <button id="next" class="buttons">Vorwärts</button>
+            <button id="toggleView" class="buttons">Zur Wochenansicht wechseln</button>
+        </div>
+
+        <div id="calendar"></div>
     </div>
-
-    <div id="calendar"></div>
 </div>
 
 <script>
@@ -165,7 +60,8 @@
             const startStr = startOfWeek.toLocaleDateString('de-DE', options);
             const endStr = endOfWeek.toLocaleDateString('de-DE', options);
 
-            weekRangeEl.textContent = `Woche: ${startStr} - ${endStr}`;
+            const weekRangeHeading = document.getElementById('weekRangeHeading');
+            weekRangeHeading.textContent = `Woche: ${startStr} - ${endStr}`;
         };
 
         const fetchEvents = async () => {

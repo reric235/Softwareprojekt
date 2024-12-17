@@ -4,195 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin-Bereich</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 30px auto;
-            background: white;
-            padding: 20px 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            position: relative;
-        }
-        h1, h2 {
-            color: #333;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        section {
-            margin-bottom: 40px;
-        }
-        form {
-            margin-bottom: 20px;
-            background: #f9f9f9;
-            padding: 20px 25px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.05);
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, select, button {
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: auto;
-            padding: 10px 20px;
-            font-size: 1rem;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            margin-bottom: 20px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.05);
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px 15px;
-            text-align: left;
-            font-size: 0.95rem;
-        }
-        th {
-            background-color: #007BFF;
-            color: white;
-            text-align: center;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
-            font-size: 0.95rem;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-        }
-
-        /* Back-Link Pfeil */
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            background-color: #007BFF;
-            color: #fff;
-            padding: 8px 12px;
-            border-radius: 4px;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-
-        .back-link:hover {
-            background-color: #0056b3;
-        }
-
-        /* Zusätzliche Styles für die neue Seminargruppe-Sektion */
-        .seminargruppe-section {
-            margin-bottom: 40px;
-        }
-
-        .seminargruppe-section form {
-            background: #f9f9f9;
-            padding: 20px 25px;
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0,0,0,0.05);
-        }
-
-        .seminargruppe-section label {
-            display: block;
-            margin-top: 10px;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .seminargruppe-section input,
-        .seminargruppe-section select,
-        .seminargruppe-section button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-
-        .seminargruppe-section button {
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        .seminargruppe-section button:hover {
-            background-color: #0056b3;
-        }
-
-        @media (min-width: 768px) {
-            form {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: space-between;
-            }
-            form > div {
-                width: 48%;
-            }
-            button {
-                width: 100%;
-            }
-        }
-    </style>
-    <!-- CSRF-Tokens für AJAX-Anfragen -->
+    <link rel="stylesheet" href="/css/styles.css">
     <meta name="_csrf" content="" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" content="" th:content="${_csrf.headerName}"/>
 </head>
 <body>
+<div class="fullcontainer2">
+    <a th:href="@{/index}" class="top-left-button" title="Zurück zur Übersicht">Zurück zur Übersicht</a>
 <div class="container">
-
     <!-- Back-Link -->
     <a th:href="@{/index}" class="back-link" title="Zurück zur Übersicht">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
@@ -200,10 +19,8 @@
             <path d="M14 6 L8 12 L14 18" />
         </svg>
     </a>
-
     <h1>Admin-Bereich</h1>
-
-    <!-- Registrierung eines Studenten -->
+    <div class="block">
     <section>
         <h2>Registrierung eines Studenten</h2>
         <form id="registrationForm">
@@ -323,7 +140,7 @@
             <button type="submit">Kalendereintrag hinzufügen</button>
         </form>
         <div id="kalendereintragMessage" class="message"></div>
-        <table>
+        <table class="table">
             <thead>
             <tr>
                 <th>ID</th>
@@ -339,8 +156,10 @@
             <!-- Kalendereinträge werden hier dynamisch eingefügt -->
             </tbody>
         </table>
-    </section>
+     </section>
+    </div>
 </div>
+
 
 <script>
     // Seminargruppen laden und in das Dropdown-Menü für die Registrierung einfügen
