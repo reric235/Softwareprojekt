@@ -8,6 +8,8 @@ import com.example.StudiDocs.service.StudiengangService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Optional;
@@ -53,10 +55,11 @@ public class AdminController {
     }
 
     @PostMapping("/seminargruppe")
-    public ResponseEntity<Seminargruppe> createSeminargruppe(@RequestBody Seminargruppe seminargruppe,
-                                                             @RequestParam int studiengangId) {
+    public ResponseEntity<Seminargruppe> createSeminargruppe(@RequestBody Seminargruppe seminargruppe, @RequestParam int studiengangId) {
         Seminargruppe neueSeminargruppe = seminargruppeService.erstelleSeminargruppe(seminargruppe, studiengangId);
-        return ResponseEntity.ok(neueSeminargruppe);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
+                .buildAndExpand(neueSeminargruppe.getSeminargruppeId()).toUri();
+        return ResponseEntity.created(location).body(neueSeminargruppe);
     }
 
     @DeleteMapping("/seminargruppe/{id}")

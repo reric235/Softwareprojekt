@@ -8,6 +8,7 @@ class StudiDocsApplicationTests {
 
 	@Test
 	void contextLoads() {
+		System.out.print("dfgwbefwfb iwpebfpiwefbpwiebfpwebf");
 	}
 
 }

@@ -18,8 +18,9 @@ public class Modul {
     @Column(nullable = false)
     private int semester;
 
-    @Column(nullable = false, length = 100)
-    private String studiengang; // Neues Feld für Studiengang
+    @ManyToOne
+    @JoinColumn(name = "studiengangId", nullable = false)
+    private Studiengang studiengang; // Neues Feld für Studiengang
 
     @OneToMany(mappedBy = "modul", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference(value = "modul-dokumente")
@@ -27,7 +28,7 @@ public class Modul {
 
     public Modul() {}
 
-    public Modul(String modulname, int semester, String studiengang) {
+    public Modul(String modulname, int semester, Studiengang studiengang) {
         this.modulname = modulname;
         this.semester = semester;
         this.studiengang = studiengang;
@@ -57,11 +58,11 @@ public class Modul {
         this.semester = semester;
     }
 
-    public String getStudiengang() {
+    public Studiengang getStudiengang() {
         return studiengang;
     }
 
-    public void setStudiengang(String studiengang) {
+    public void setStudiengang(Studiengang studiengang) {
         this.studiengang = studiengang;
     }
 

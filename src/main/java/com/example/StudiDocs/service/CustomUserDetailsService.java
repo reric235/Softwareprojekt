@@ -1,5 +1,3 @@
-// src/main/java/com/example/StudiDocs/service/CustomUserDetailsService.java
-
 package com.example.StudiDocs.service;
 
 import com.example.StudiDocs.model.Student;
@@ -7,6 +5,7 @@ import com.example.StudiDocs.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.User; // Hinzugefügter Import
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
