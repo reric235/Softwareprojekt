@@ -10,8 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface DokumentRepository extends JpaRepository<Dokument, Integer> {
-
     Optional<Dokument> findById(int id);
-
     List<Dokument> findByModulModulId(int modulId, Sort sort);
 }
