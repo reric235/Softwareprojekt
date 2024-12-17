@@ -5,126 +5,54 @@
 <head>
     <meta charset="UTF-8">
     <title>Studentenrat - Admin-Bereich</title>
-    <style>
-        /* Grundlegendes CSS-Design */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4;
-        }
-        h1, h2 {
-            color: #333;
-        }
-        section {
-            margin-bottom: 40px;
-        }
-        form {
-            margin-bottom: 20px;
-            background: #fff;
-            padding: 20px;
-            border-radius: 5px;
-        }
-        input, select, button {
-            padding: 10px;
-            margin-right: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-        }
-        button:hover {
-            background-color: #0069d9;
-            cursor: pointer;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: #fff;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f8f9fa;
-        }
-        .message {
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            display: none;
-        }
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .delete-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-        }
-        .delete-btn:hover {
-            background-color: #c82333;
-            cursor: pointer;
-        }
-    </style>
-    <!-- CSRF-Token als Meta-Tags -->
+    <link rel="stylesheet" href="/css/styles.css">
     <meta name="_csrf" content="" th:content="${_csrf.token}"/>
     <meta name="_csrf_header" content="" th:content="${_csrf.headerName}"/>
 </head>
 <body>
-<h1>Studentenrat - Admin-Bereich</h1>
+<div class="fullcontainer2">
+    <h1>Studentenrat - Admin-Bereich</h1>
 
-<!-- Kalendereinträge verwalten -->
-<section>
-    <h2>Kalendereinträge verwalten</h2>
+    <!-- Kalendereinträge verwalten -->
+    <section class="block">
+        <h2>Kalendereinträge verwalten</h2>
 
-    <form id="kalendereintragForm">
-        <input type="text" id="beschreibung" placeholder="Beschreibung" required>
-        <input type="date" id="eintragsdatum" required>
-        <select id="eventType" required>
-            <option value="" disabled selected>Event-Typ wählen...</option>
-            <option value="PRUEFUNG">Prüfung</option>
-            <option value="EVENT">Event</option>
-        </select>
-        <input type="time" id="startTime" required>
-        <input type="time" id="endTime" required>
-        <select id="seminargruppeSelect" required>
-            <option value="" disabled selected>Seminargruppe wählen...</option>
-        </select>
-        <button type="submit">Kalendereintrag hinzufügen</button>
-    </form>
-    <div id="kalendereintragMessage" class="message"></div>
-    <table>
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Beschreibung</th>
-            <th>Datum</th>
-            <th>Startzeit</th>
-            <th>Endzeit</th>
-            <th>Event-Typ</th>
-            <th>Aktionen</th>
-        </tr>
-        </thead>
-        <tbody id="kalendereintragTableBody">
-        <!-- Kalendereinträge werden hier dynamisch eingefügt -->
-        </tbody>
-    </table>
-</section>
+        <form id="kalendereintragForm">
+            <input type="text" id="beschreibung" placeholder="Beschreibung" required>
+            <input type="date" id="eintragsdatum" required>
+            <select id="eventType" required>
+                <option value="" disabled selected>Event-Typ wählen...</option>
+                <option value="PRUEFUNG">Prüfung</option>
+                <option value="EVENT">Event</option>
+            </select>
+            <input type="time" id="startTime" required>
+            <input type="time" id="endTime" required>
+            <select id="seminargruppeSelect" required>
+                <option value="" disabled selected>Seminargruppe wählen...</option>
+            </select>
+            <button type="submit">Kalendereintrag hinzufügen</button>
+        </form>
+
+        <div id="kalendereintragMessage" class="message"></div>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Beschreibung</th>
+                <th>Datum</th>
+                <th>Startzeit</th>
+                <th>Endzeit</th>
+                <th>Event-Typ</th>
+                <th>Aktionen</th>
+            </tr>
+            </thead>
+            <tbody id="kalendereintragTableBody">
+            <!-- Kalendereinträge werden hier dynamisch eingefügt -->
+            </tbody>
+        </table>
+    </section>
+</div>
 
 <script>
     // CSRF-Token aus den Meta-Tags abrufen
@@ -163,18 +91,18 @@
             tableBody.innerHTML = '';
             kalendereintraege.forEach(eintrag => {
                 tableBody.innerHTML += `
-                    <tr>
-                        <td>${eintrag.kalendereintragId}</td>
-                        <td>${eintrag.beschreibung}</td>
-                        <td>${eintrag.eintragsdatum}</td>
-                        <td>${eintrag.startTime}</td>
-                        <td>${eintrag.endTime}</td>
-                        <td>${eintrag.eventType}</td>
-                        <td>
-                            <button class="delete-btn" onclick="deleteKalendereintrag(${eintrag.kalendereintragId})">Löschen</button>
-                        </td>
-                    </tr>
-                `;
+                        <tr>
+                            <td>${eintrag.kalendereintragId}</td>
+                            <td>${eintrag.beschreibung}</td>
+                            <td>${eintrag.eintragsdatum}</td>
+                            <td>${eintrag.startTime}</td>
+                            <td>${eintrag.endTime}</td>
+                            <td>${eintrag.eventType}</td>
+                            <td>
+                                <button class="delete-btn" onclick="deleteKalendereintrag(${eintrag.kalendereintragId})">Löschen</button>
+                            </td>
+                        </tr>
+                    `;
             });
         } catch (error) {
             displayMessage('kalendereintragMessage', error.message, 'error');
@@ -272,7 +200,6 @@
     window.onload = function () {
         fetchSeminargruppen();
         fetchKalendereintraege();
-        // Weitere Initialisierungen können hier hinzugefügt werden
     };
 </script>
 </body>

@@ -1,109 +1,30 @@
 <!DOCTYPE html>
-<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<html lang="de" xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Startseite - Studentenportal</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            background-color: #007BFF;
-            padding: 15px;
-            text-align: center;
-        }
-        .navbar a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-size: 18px;
-        }
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            width: 80%;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .buttons {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-        }
-        .buttons a {
-            display: inline-block;
-            padding: 15px 25px;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        .buttons a:hover {
-            background-color: #218838;
-        }
-        .admin {
-            background-color: #17a2b8;
-        }
-        .admin:hover {
-            background-color: #138496;
-        }
-        .studentenrat {
-            background-color: #ffc107;
-            color: black;
-        }
-        .studentenrat:hover {
-            background-color: #e0a800;
-        }
-        .dokumentenmanagement {
-            background-color: #6c757d;
-        }
-        .dokumentenmanagement:hover {
-            background-color: #5a6268;
-        }
-        .kalender {
-            background-color: #007BFF;
-        }
-        .kalender:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-
-<!-- Navigationsleiste -->
-<div class="navbar">
-    <a th:href="@{/index}">Startseite</a>
-    <a th:href="@{/login}">Logout</a>
-</div>
-
-<!-- Hauptinhalt -->
 <div class="container">
-    <h1>Willkommen zum Studentenportal</h1>
-    <p>Wählen Sie eine der folgenden Optionen, um fortzufahren:</p>
-    <div class="buttons">
-        <!-- Admin-Bereich nur für ADMIN anzeigen -->
-        <a th:if="${isAdmin}" th:href="@{/admin}" class="admin">Admin-Bereich</a>
+    <a th:href="@{/login}" class="top-left-button" title="Zurück zum Login">Zurück zum Login</a>
 
-        <!-- Studentenrat-Bereich nur für STUDENTENRAT anzeigen -->
-        <a th:if="${isStudentenrat}" th:href="@{/studentenrat}" class="studentenrat">Studentenrat</a>
-
-        <!-- Dokumentenmanagement für alle authentifizierten Benutzer anzeigen -->
-        <a th:href="@{/dokumente}" class="dokumentenmanagement">Dokumentenmanagement</a>
-
-        <!-- Kalender für alle authentifizierten Benutzer anzeigen -->
-        <a th:href="@{/kalender}" class="kalender">Kalender</a>
+    <div class="block logo-block">
+        <div class="logo">
+            <img src="/images/logo_studidocs.svg" alt="StudiDocs Logo">
+        </div>
+    </div>
+    <div class="block welcome-block">
+        <h2>Willkommen zum Studentenportal</h2>
+        <p>Wählen Sie eine der folgenden Optionen, um fortzufahren:</p>
+        <br></br>
+        <div>
+            <a th:if="${isAdmin}" th:href="@{/admin}" class="admin">Admin-Bereich</a>
+            <a th:if="${isStudentenrat}" th:href="@{/studentenrat}" class="studentenrat">Studentenrat</a>
+            <a th:href="@{/dokumente}" class="dokumentenmanagement">Dokumentenmanagement</a>
+            <a th:href="@{/kalender}" class="kalender">Kalender</a>
+        </div>
     </div>
 </div>
 

@@ -1,0 +1,461 @@
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #e0f7fa, #80deea);
+    margin: 0;
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 40px);
+    overflow: auto;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 420px;
+    height: auto;
+}
+
+.fullcontainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 95%;
+    height: auto;
+}
+
+.fullcontainer2{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 60%;
+    height: auto;
+}
+
+.block {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    text-align: center;
+    overflow: auto;
+    border: solid #007BFF;
+
+
+}
+
+@media (max-width: 500px) {
+    .block {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 24px;
+    }
+}
+
+
+.logo-block {
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.logo img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Login-spezifische Anpassungen */
+.h1 {
+    font-size: 26px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.h2 {
+    font-size: 20px;
+    margin-bottom: 18px;
+    color: #333;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: box-shadow 0.3s ease;
+}
+
+.input:focus {
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+.button {
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.links {
+    margin-top: 15px;
+}
+
+.links a {
+    color: #007BFF;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}
+
+.error-message {
+    color: red;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.success-message {
+    color: green;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* Registrierungs-spezifische Anpassungen */
+.registration-block {
+    padding-top: 40px; /* Der Block für die Registrierung hat einen größeren oberen Rand */
+}
+
+.top-left-button {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    padding: 8px 12px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.top-left-button:hover {
+    background-color: #0056b3;
+}
+
+.message {
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.message.success {
+    color: green;
+}
+
+.message.error {
+    color: red;
+}
+
+select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+/* Stil für das Formular in der Registrierung */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    margin: 10px 0 5px;
+}
+
+input, select {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(90deg, #0056b3, #003f7f);
+}
+
+.buttons {
+    padding: 8px 12px;
+    border: none;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007BFF;
+    cursor: pointer;
+}
+
+.buttons:hover {
+    background-color: #0056b3;
+}
+
+.logout {
+    text-decoration: none;
+    font-size: 16px;
+    color: #007BFF;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+
+.logout:hover {
+    color: #0056b3;
+}
+
+.welcome-block {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    overflow: auto;
+    border: solid #007BFF;
+}
+
+.welcome-block2 {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    overflow: auto;
+    border: solid #007BFF;
+    margin: 0 auto;
+}
+
+.welcome-block a {
+    text-decoration: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #007BFF, #0056b3);
+    border-radius: 8px;
+    margin: 10px;
+    display: inline-block;
+    transition: background 0.3s ease;
+}
+
+.welcome-block a:hover {
+    background: linear-gradient(90deg, #0056b3, #003f7f);
+}
+
+.table {
+    width: 100%; /* Tabelle nimmt die gesamte Breite des Containers ein */
+    border-collapse: collapse; /* Entfernt doppelte Rahmen */
+    margin: 20px 0; /* Abstand nach oben und unten */
+    font-size: 16px;
+    text-align: left; /* Text linksbündig */
+    background-color: rgba(255, 255, 255, 0.95); /* Heller Hintergrund */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Leichter Schatten */
+    border-radius: 8px; /* Abgerundete Ecken */
+    overflow: hidden; /* Schneidet überflüssige Inhalte ab */
+}
+
+.table thead {
+    background: linear-gradient(90deg, #0b59ae, #042d5c); /* Gradient für Kopfzeile */
+    color: #fff; /* Weiße Schriftfarbe */
+    font-weight: bold;
+}
+
+.table th,
+.table td {
+    padding: 12px 20px; /* Platz für Inhalt */
+    border-bottom: 1px solid #ddd; /* Dünne graue Linie als Trennung */
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: rgba(240, 248, 255, 0.5); /* Dezente Hintergrundfarbe für ungerade Zeilen */
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #fff; /* Weiß für gerade Zeilen */
+}
+
+.table tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1); /* Hellblauer Hover-Effekt */
+    transition: background-color 0.3s ease; /* Weicher Übergang */
+}
+
+.table th {
+    text-align: left; /* Spaltenüberschriften linksbündig */
+    font-size: 14px; /* Kleinere Schrift für Überschriften */
+}
+
+.table td {
+    font-size: 14px; /* Konsistente Schriftgröße */
+}
+
+/* Aktionen (letzte Spalte) mit Buttons stylen */
+.table td:last-child {
+    text-align: center; /* Zentrierte Aktionen */
+}
+
+.table .action-button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(90deg, #007BFF, #0056b3); /* Blaue Buttons */
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.table .action-button:hover {
+    background: linear-gradient(90deg, #0056b3, #003f7f); /* Dunklerer Hover-Effekt */
+}
+
+.month-year {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Steuerungsknöpfe */
+.controls {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.buttons {
+    padding: 10px 15px;
+    font-size: 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.buttons:hover {
+    background-color: #0056b3;
+}
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 Spalten für die Wochentage */
+    grid-gap: 5px;
+    margin-top: 20px;
+    max-width: 100%;
+}
+
+.header {
+    text-align: center;
+    font-weight: bold;
+    padding: 10px 0;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+}
+
+#weekRangeHeading {
+    font-size: 23px;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 16px; /
+}
+
+.day {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    font-size: 1.2rem;
+    position: relative;
+}
+
+.day.inactive {
+    background-color: #f4f4f4;
+}
+
+.day.current {
+    background-color: #ffdd57;
+    font-weight: bold;
+}
+
+.event {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    font-size: 0.8rem;
+    color: #fff;
+    background-color: #28a745;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+#toggleView {
+    background-color: #28a745;
+}
+
+#toggleView:hover {
+    background-color: #218838;
+}
+
+
+
+
+
+
