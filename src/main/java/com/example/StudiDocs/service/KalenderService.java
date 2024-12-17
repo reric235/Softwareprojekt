@@ -25,6 +25,10 @@ public class KalenderService {
         this.kalendereintragRepository = kalendereintragRepository;
     }
 
+    public Kalender saveKalender(Kalender kalender) {
+        return kalenderRepository.save(kalender);
+    }
+
     @Transactional
     public Kalendereintrag eintragenKalendereintrag(Kalendereintrag kalendereintrag) {
         if (!kalenderRepository.existsById(kalendereintrag.getKalender().getKalenderId())) {
@@ -46,10 +50,6 @@ public class KalenderService {
         } else {
             throw new IllegalArgumentException("Kalendereintrag mit der ID " + kalendereintragId + " existiert nicht.");
         }
-    }
-
-    public List<Kalendereintrag> getAlleKalendereintraege() {
-        return kalendereintragRepository.findAll();
     }
 
     public List<Kalendereintrag> findeKalendereintraegeByKalender(int kalenderId) {

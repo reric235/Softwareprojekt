@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.Date;
@@ -77,7 +76,6 @@ public class DokumentService {
                 Files.deleteIfExists(filePath);
                 dokumentRepository.deleteById(dokumentId);
             } else {
-                // Keine Berechtigung
                 throw new IllegalArgumentException("Sie sind nicht berechtigt, dieses Dokument zu löschen.");
             }
         } else {

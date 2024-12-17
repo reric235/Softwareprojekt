@@ -2,6 +2,7 @@ package com.example.StudiDocs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +28,12 @@ public class Seminargruppe {
 
     public Seminargruppe() {}
 
+    public Seminargruppe(int seminargruppeId, String name, Studiengang studiengang) {
+        this.seminargruppeId = seminargruppeId;
+        this.name = name;
+        this.studiengang = studiengang;
+    }
+
     public int getSeminargruppeId() {
         return seminargruppeId;
     }
@@ -51,28 +58,6 @@ public class Seminargruppe {
         this.studiengang = studiengang;
     }
 
-    public List<Student> getStudenten() {
-        return studenten;
-    }
-
-    public void setStudenten(List<Student> studenten) {
-        this.studenten = studenten;
-    }
-
-    public void addStudent(Student student) {
-        if (!studenten.contains(student)) {
-            studenten.add(student);
-            student.setSeminargruppe(this);
-        }
-    }
-
-    public void removeStudent(Student student) {
-        if (studenten.contains(student)) {
-            studenten.remove(student);
-            student.setSeminargruppe(null);
-        }
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -94,5 +79,10 @@ public class Seminargruppe {
                 "seminargruppeId=" + seminargruppeId +
                 ", name='" + name + '\'' +
                 '}';
+    }
+
+    @JsonProperty("studiengangId")
+    public int getStudiengangId() {
+        return this.studiengang.getStudiengangId();
     }
 }
