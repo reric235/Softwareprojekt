@@ -72,8 +72,14 @@ public class DokumentService {
             boolean isOwner = dokument.getStudent().getEmail().equalsIgnoreCase(currentUser.getEmail());
 
             if (isAdmin || isOwner) {
-                Path filePath = Paths.get(dokument.getFilePath());
+                // Absoluter Pfad zum Ordner "resources/Files"
+                Path resourcesDirectory = Paths.get("src", "main", "resources", "Files").toAbsolutePath();
+                Path filePath = resourcesDirectory.resolve(dokument.getFilePath());
+
+                // Datei löschen
                 Files.deleteIfExists(filePath);
+
+                // Dokument aus der Datenbank löschen
                 dokumentRepository.deleteById(dokumentId);
             } else {
                 throw new IllegalArgumentException("Sie sind nicht berechtigt, dieses Dokument zu löschen.");
@@ -82,6 +88,7 @@ public class DokumentService {
             throw new IllegalArgumentException("Dokument mit der ID " + dokumentId + " existiert nicht.");
         }
     }
+
 
 
     public List<Dokument> findeDokumenteByModulSortiert(int modulId, String sortParam) {
