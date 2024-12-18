@@ -261,6 +261,7 @@
         }
     }
 
+
     // Seminargruppen für den Kalender laden
     async function fetchSeminargruppenForKalender() {
         const seminargruppeSelect = document.getElementById('seminargruppeSelect');
@@ -484,6 +485,87 @@
             messageEl.style.display = 'block';
         }
     });
+
+    // Event Listener für das Kalendereintrag-Formular
+    document.getElementById('kalendereintragForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Formulardaten abrufen
+        const beschreibung = document.getElementById('beschreibung').value.trim();
+        const eintragsdatum = document.getElementById('eintragsdatum').value;
+        const eventType = document.getElementById('eventType').value;
+        const startTime = document.getElementById('startTime').value;
+        const endTime = document.getElementById('endTime').value;
+        const seminargruppeId = parseInt(document.getElementById('seminargruppeSelect').value);
+
+        // CSRF-Token und Header aus den Meta-Tags abrufen
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute('content');
+
+        // Nachrichtenelement für Rückmeldungen
+        const messageEl = document.getElementById('kalendereintragMessage');
+        messageEl.textContent = '';
+        messageEl.className = 'message';
+        messageEl.style.display = 'none';
+
+        // Überprüfen, ob alle erforderlichen Felder ausgefüllt sind
+        if (!beschreibung || !eintragsdatum || !eventType || !startTime || !endTime || !seminargruppeId) {
+            messageEl.textContent = 'Bitte alle Felder ausfüllen.';
+            messageEl.classList.add('error');
+            messageEl.style.display = 'block';
+            return;
+        }
+
+        // Erstellung des Payloads entsprechend dem Controller
+        const payload = {
+            beschreibung: beschreibung,
+            eintragsdatum: eintragsdatum,
+            eventType: eventType,
+            startTime: startTime,
+            endTime: endTime,
+            seminargruppeId: seminargruppeId
+        };
+
+        try {
+            const response = await fetch('/kalender/kalendereintrag', { // Korrigierte URL entsprechend dem Controller-Mapping
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    [csrfHeader]: csrfToken // Dynamischer Headername für CSRF
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                const responseText = await response.text();
+                messageEl.textContent = responseText || 'Kalendereintrag erfolgreich hinzugefügt.';
+                messageEl.classList.add('success');
+                messageEl.style.display = 'block';
+                document.getElementById('kalendereintragForm').reset();
+                fetchKalendereintraege(); // Aktualisiert die Tabelle mit den Kalendereinträgen
+            } else {
+                // Versuche, die Fehlermeldung aus dem Server zu extrahieren
+                let errorMessage = 'Kalendereintrag konnte nicht hinzugefügt werden.';
+                try {
+                    const errorData = await response.json();
+                    if (errorData && errorData.error) {
+                        errorMessage = errorData.error;
+                    }
+                } catch (jsonError) {
+                    console.error('Fehler beim Parsen der Fehlermeldung:', jsonError);
+                }
+                messageEl.textContent = `Fehler: ${errorMessage}`;
+                messageEl.classList.add('error');
+                messageEl.style.display = 'block';
+            }
+        } catch (error) {
+            // Netzwerk- oder andere unerwartete Fehler
+            messageEl.textContent = `Netzwerkfehler: ${error.message}`;
+            messageEl.classList.add('error');
+            messageEl.style.display = 'block';
+        }
+    });
+
 
     /**
      * Funktion zur Anzeige von Meldungen.
