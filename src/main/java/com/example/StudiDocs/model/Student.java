@@ -24,7 +24,6 @@ public class Student {
     private String email;
 
     @Column(nullable = false)
-    @JsonIgnore
     private String passwort;
 
     @Enumerated(EnumType.STRING)
